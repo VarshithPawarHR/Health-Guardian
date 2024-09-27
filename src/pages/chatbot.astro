@@ -1,19 +1,38 @@
 ---
+import { chatsTable } from '@lib/db/schema';
 import Chatbot3D from '../components/Chatbot3D';
 import Layout from '../layouts/Layout.astro';
 import { getSession } from 'auth-astro/server';
-import type { Session } from '@auth/core/types';
+import { db } from '@lib/db';
+import { eq } from 'drizzle-orm';
+import { promise } from 'astro:schema';
 
 const session = await getSession(Astro.request);
 
-
-if (!session?.user) {
+if (!session?.user?.id) {
   return Astro.redirect('/');
 }
+
+
+const chats =  await db
+  .select({
+    userId: chatsTable.userId,
+    content: chatsTable.content,
+    isBot: chatsTable.isBot,
+  })
+  .from(chatsTable)
+  .where(eq(chatsTable.userId, session.user.id));
+
+
+const processedChats = chats.map(chat=>({
+    content: chat.content,
+    user: !chat.isBot
+}))
+
 ---
 
 <Layout title="Welcome to Astro.">
-    <Chatbot3D client:only="react" session={session} />
+    <Chatbot3D client:only="react" session={session} chats={processedChats} />
 </Layout>
 
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Html } from "@react-three/drei";
 import { Avatar2 } from "./Avatar2";
 import type { Session } from "@auth/core/types";
+import type { Chat } from "@lib/types";
 
 function base64ToBlob(base64: string, contentType: string) {
   const binaryString = atob(base64);
@@ -15,13 +16,9 @@ function base64ToBlob(base64: string, contentType: string) {
   return new Blob([bytes], { type: contentType });
 }
 
-function Wrapper({ session }: { session: Session }) {
-  const [messages, setMessages] = useState<
-    {
-      content: string;
-      user: boolean;
-    }[]
-  >([]);
+function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
+  console.log("chats", chats);
+  const [messages, setMessages] = useState<Chat[]>(chats);
 
   const [currentMessage, setCurrentMessage] = useState<{
     text: string;
