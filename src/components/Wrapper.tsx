@@ -1,7 +1,7 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Avatar } from "./Avatar";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Html } from "@react-three/drei";
 import { Avatar2 } from "./Avatar2";
+import type { Session } from "@auth/core/types";
 
 function base64ToBlob(base64: string, contentType: string) {
   const binaryString = atob(base64);
@@ -15,7 +15,7 @@ function base64ToBlob(base64: string, contentType: string) {
   return new Blob([bytes], { type: contentType });
 }
 
-function Wrapper() {
+function Wrapper({ session }: { session: Session }) {
   const [messages, setMessages] = useState<
     {
       content: string;
@@ -88,6 +88,14 @@ function Wrapper() {
     }
   };
 
+  let messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "auto",
+    });
+  };
+
   useEffect(() => {
     if (currentMessage) {
       currentMessage.audioPlayer.play();
@@ -95,7 +103,10 @@ function Wrapper() {
         setCurrentMessage(null);
       };
     }
+    scrollToBottom();
   }, [currentMessage]);
+
+  scrollToBottom();
 
   return (
     <>
@@ -109,18 +120,27 @@ function Wrapper() {
 
       <Html position-y={[-1, -1, 0]}>
         <div className="w-80 h-screen fixed top-0 right-0 z-10 bg-white/70 text-black flex flex-col gap-4 p-4">
-          <div className="w-full flex-grow">
-            {messages.map((message) => (
-              <div>
-                <div>{message.user ? "" : ""}</div>
-                <p>{message.content}</p>
-              </div>
-            ))}
+          <div className="w-full flex-grow overflow-y-auto">
+            <div className="w-full min-h-full h-fit flex flex-col gap-2 justify-end">
+              {messages.map((message) => (
+                <div
+                  className={`${
+                    message.user ?  "ml-auto text-right":"mr-auto"
+                  } bg-cyan-400/10 px-2 py-4 rounded`}
+                >
+                  <h4 className="text-gray-700 text-sm">
+                    {message.user ? "user":"bot"}
+                  </h4>
+                  <p>{message.content}</p>
+                </div>
+              ))}
+              <div ref={messagesEndRef} className="hidden"></div>
+            </div>
           </div>
-          <form className="flex flex-row " onSubmit={handleSubmit}>
+          <form className="flex flex-row gap-2" onSubmit={handleSubmit}>
             <textarea
               name="query"
-              className="flex-grow"
+              className="flex-grow p-2 "
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             ></textarea>
@@ -128,7 +148,9 @@ function Wrapper() {
               <img src="" alt="mic" />
               <button
                 disabled={isBusy}
-                className={`${isBusy}?"bg-green-500":"bg-green-100"`}
+                className={`${
+                  isBusy ? "bg-muted-600" : "bg-primary-500"
+                } text-white rounded p-2`}
               >
                 ask
               </button>

@@ -1,8 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import Experience from "./Experience";
+import type { Session } from '@auth/core/types';
 
-function Chatbot3D() {
+function Chatbot3D({session}:{session:Session}) {
   return (
     <>
       <Canvas
@@ -11,7 +12,7 @@ function Chatbot3D() {
         className="w-full !h-screen"
       >
         <color attach="background" args={["#ececec"]} />
-        <Experience />
+        <Experience session={session}/>
         <Environment preset="sunset" />
       </Canvas>
     </>
