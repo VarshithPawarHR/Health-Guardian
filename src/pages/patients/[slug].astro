@@ -1,13 +1,26 @@
 ---
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "@lib/db";
-import { chatsTable } from '@lib/db/schema';
+import { chatsTable, userTable } from '@lib/db/schema';
 import { eq } from "drizzle-orm";
+import { getSession } from 'auth-astro/server';
+import Layout from "@layouts/Layout.astro";
 
 const {slug} = Astro.params;
 
 const patientId = slug!;
 
+const patients= await db.select({
+  id:userTable.id,
+  name:userTable.name
+}).from(userTable)
+.where(eq(userTable.id,patientId));
+
+if(!patients.length){
+  return Astro.redirect("/");
+}
+
+const patient = patients[0]
 
 const chats =  await db
   .select({
@@ -21,10 +34,11 @@ const chats =  await db
   
   const chatString = chats.reduce((p,chat)=> `${p} \n ${chat.isBot?"user":"model"} : ${chat.content}`,"")
 
+  let summary;
 
   if(chatString){
     const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_KEY);
-  const model = genAI.getGenerativeModel({
+    const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
         generationConfig: {
           candidateCount: 1,
@@ -39,42 +53,33 @@ const chats =  await db
 
     const result = await model.generateContent(prompt);
 
-    result.response.text()
+    summary = result.response.text()
   }
+
+const session = await getSession(Astro.request);
+
+if(!session?.user?.id){
+  return Astro.redirect("/")
+}
+
 ---
-
-
-
-  <section class="profile-container">
+<Layout title="">
+  <section class="profile-container text-white">
     <!-- Profile Header -->
-    <div class="profile-header">
-      <div class="profile-pic">
-        <!-- Profile picture placeholder -->
-      </div>
-      <div class="profile-info">
-        <h1>{user.name}</h1>
-        <p>USN: {user.usn}</p>
-        <p>Branch: {user.branch}</p>
-      </div>
-      <div class="profile-actions">
-        <button class="edit-btn">Edit</button>
-        <!-- Social Links -->
-        <div class="social-links">
-          <a href={user.socialLinks.linkedin} target="_blank" class="social-icon linkedin"></a>
-          <a href={user.socialLinks.github} target="_blank" class="social-icon github"></a>
-          <a href={user.socialLinks.twitter} target="_blank" class="social-icon twitter"></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Profile Content -->
-    <div class="profile-content">
-      <div class="blogs">Blogs Posted</div>
-      <div class="events">Event Card</div>
-     
-    </div>
+    <h1>{patient.name}</h1>
+    {
+      summary?(
+      <p>
+      {summary}
+      </p>
+      ):(
+        <p>
+          No iteraction so far
+        </p>
+      )
+    }
   </section>
-
+</Layout>
 
 <style>
   .profile-container {

@@ -1,25 +1,23 @@
 ---
 import Layout from "@layouts/Default.astro";
-import ButtonMain from "@components/base/ButtonMain.astro";
-import HeroMain from "@components/hero/HeroMain.astro";
 import SectionMuted from "@components/section/SectionMuted.astro";
 import Container from "@components/section/Container.astro";
 import SectionTitle from "@components/section/SectionTitle.astro";
-import IconBlock from "@components/content/IconBlock.astro";
-import Toolbar from "@components/content/doctors/grid/Toolbar.astro";
-import Filters from "@components/content/doctors/grid/Filters.astro";
-import Grid from "@components/content/doctors/grid/Grid.astro";
-import SideStatsRight from "@components/content/features/SideStatsRight.astro";
-import SideStatsLeft from "@components/content/features/SideStatsLeft.astro";
-import Pricing from "@components/content/Pricing.astro";
-import Cta from "@components/content/Cta.astro";
-import Testimonials from "@components/content/Testimonials.astro";
 import HeroMainModuleOne from "@components/hero/HeroMainModuleOne.astro";
 import Patientcard from "@components/patientcard.astro";
+
+import { db } from "@lib/db";
+import { userTable } from "@lib/db/schema";
+import { eq } from "drizzle-orm";
+
+const patients= await db.select({
+  id:userTable.id,
+  name:userTable.name
+}).from(userTable)
+.where(eq(userTable.role,"PATIENT"));
 ---
 
 <Layout title="Home">
-
 
 <div
   class="min-h-screen w-full overflow-hidden bg-muted-100 dark:bg-muted-1000"
@@ -96,7 +94,11 @@ import Patientcard from "@components/patientcard.astro";
       minititle=""
       class="'mx-auto text-center'"
     />
-    <Patientcard/>
+    
+    {patients.map(patient=>(<div>
+
+    <Patientcard name={patient.name} id={patient.id}/>
+    </div>))}
 
     
   

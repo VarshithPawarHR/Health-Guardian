@@ -14,6 +14,11 @@ import SideStatsLeft from "@components/content/features/SideStatsLeft.astro";
 import Pricing from "@components/content/Pricing.astro";
 import Cta from "@components/content/Cta.astro";
 import Testimonials from "@components/content/Testimonials.astro";
+
+if(Astro.locals.role=="DOCTOR"){
+  return Astro.redirect("/doctor")
+}
+
 ---
 
 <Layout title="Home">
