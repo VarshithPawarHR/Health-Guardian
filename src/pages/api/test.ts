@@ -2,7 +2,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { APIRoute } from "astro";
 import * as sdk from "microsoft-cognitiveservices-speech-sdk";
 import { PassThrough } from "stream";
-import ollama from "ollama";
 
 export const POST: APIRoute = async ({ request }) => {
   const {
