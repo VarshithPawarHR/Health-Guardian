@@ -53,3 +53,14 @@ export const accountsTableRelations = relations(accounts, ({ one }) => ({
     references: [userTable.id],
   }),
 }));
+
+export const chatsTable = sqliteTable("chat", {
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  isBot: integer("is_bot", { mode: "boolean" }).default(false).notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
