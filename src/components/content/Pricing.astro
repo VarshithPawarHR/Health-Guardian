@@ -1,3 +1,7 @@
+---
+import { SignInButton } from "@clerk/astro/react";
+---
+
 <div id="pricing" class="w-full max-w-6xl mx-auto"  x-intersect="activeStep = 'spy-3'">
   <div class="p-6 md:p-10 rounded-2xl bg-muted-200 dark:bg-muted-900">
     <div class="grid md:grid-cols-2 ltablet:grid-cols-3 lg:grid-cols-3 gap-6">
@@ -15,9 +19,7 @@
               href="#"
               class="group inline-flex items-center gap-4 text-primary-500 hover:text-primary-400 transition-colors duration-300"
             >
-              <span class="font-sans font-medium text-sm">
-                Learn more in our FAQ
-              </span>
+              
               <iconify-icon class="iconify w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" icon="lucide:arrow-right"></iconify-icon>
             </a>
           </div>
@@ -48,7 +50,7 @@
           <p
             class="font-sans text-sm py-2 mt-1 text-muted-500 dark:text-muted-400"
           >
-            A starter membership to help us build more free products.
+            free to patients
           </p>
           <div class="flex items-center mt-2 mb-4">
             <h4
@@ -63,29 +65,24 @@
           <ul class="pb-4 space-y-1 text-muted-400">
             <li class="flex items-center">
               <iconify-icon class="iconify block mr-1" icon="lucide:check"></iconify-icon>
-              <span class="font-sans text-sm">Tracking dashboard</span>
+              <span class="font-sans text-sm">dont believe??</span>
             </li>
             <li class="flex items-center">
               <iconify-icon class="iconify block mr-1" icon="lucide:check"></iconify-icon>
-              <span class="font-sans text-sm">Appointments</span>
+              <span class="font-sans text-sm">Its free</span>
             </li>
             <li class="flex items-center">
               <iconify-icon class="iconify block mr-1" icon="lucide:check"></iconify-icon>
-              <span class="font-sans text-sm">Video Calls</span>
+              <span class="font-sans text-sm">covered in Your insurance</span>
             </li>
           </ul>
           <a
             href="#"
             class="block w-full text-sm text-center font-sans my-2 py-4 font-medium text-primary-600 hover:text-muted-100 hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 rounded-lg border border-primary-600/25 transition-all duration-300"
           >
-            Create Account
+          <SignInButton  />
           </a>
-          <a
-            href="#"
-            class="block w-full text-sm text-center font-sans mb-2 py-4 font-medium text-muted-500 hover:text-muted-600 dark:text-muted-300 dark:hover:text-muted-100 rounded-lg border border-solid border-transparent hover:bg-muted-100 dark:hover:bg-muted-700 transition-colors duration-300"
-          >
-            Learn More
-          </a>
+          
         </div>
       </div>
       <!-- Pricing option -->
@@ -106,20 +103,20 @@
             <h3
               class="font-heading text-2xl font-medium text-muted-800 dark:text-white"
             >
-              Company
+              Hospitals
             </h3>
           </div>
 
           <p
             class="font-sans text-sm py-2 mt-1 text-muted-500 dark:text-muted-400"
           >
-            A starter membership to help us build more free products.
+           Customised to your hospital's or clinic's need
           </p>
           <div class="flex items-center mt-2 mb-4">
             <h4
               class="font-heading text-4xl font-semibold text-muted-800 dark:text-white mr-4"
             >
-              $99
+              $100
             </h4>
             <span class="font-sans text-xs text-muted-500 dark:text-muted-400">
               <span>/per month</span>
@@ -132,25 +129,20 @@
             </li>
             <li class="flex items-center">
               <iconify-icon class="iconify block mr-1" icon="lucide:check"></iconify-icon>
-              <span class="font-sans text-sm">Appointments</span>
+              <span class="font-sans text-sm">Track patients greivence</span>
             </li>
             <li class="flex items-center">
               <iconify-icon class="iconify block mr-1" icon="lucide:check"></iconify-icon>
-              <span class="font-sans text-sm">Video Calls</span>
+              <span class="font-sans text-sm">Help in accurate diagnostics</span>
             </li>
           </ul>
           <a
             href="#"
             class="block w-full text-sm text-center font-sans my-2 py-4 font-medium text-primary-600 hover:text-muted-100 hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 rounded-lg border border-primary-600/25 transition-all duration-300"
           >
-            Create Account
+          <SignInButton  />
           </a>
-          <a
-            href="#"
-            class="block w-full text-sm text-center font-sans mb-2 py-4 font-medium text-muted-500 hover:text-muted-600 dark:text-muted-300 dark:hover:text-muted-100 rounded-lg border border-solid border-transparent hover:bg-muted-100 dark:hover:bg-muted-700 transition-colors duration-300"
-          >
-            Learn More
-          </a>
+          
         </div>
       </div>
     </div>
