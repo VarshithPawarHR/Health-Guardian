@@ -1,0 +1,19 @@
+---
+import Chatbot3D from '../components/Chatbot3D';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Welcome to Astro.">
+    <Chatbot3D client:only="react"/>
+</Layout>
+
+
+<style is:global>
+    #canvas{
+        position: fixed;
+        top:0;
+        left:0;
+        width: 100vw;
+        height: 100vh;
+    }
+</style>
