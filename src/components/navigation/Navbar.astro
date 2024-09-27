@@ -31,24 +31,7 @@ import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/astro/comp
           >Health Guardian</span
         >
       </a>
-      <div
-        role="button"
-        class="hidden md:block relative"
-        @click.away="closeFilters()"
-      >
-        <input
-          type="text"
-          class="peer pl-9 pr-4 py-2 h-10 text-sm leading-5 font-sans w-full rounded-xl bg-white text-slate-600 border border-slate-300 focus-visible:shadow-lg focus-visible:shadow-slate-300/50 dark:focus-visible:shadow-slate-800/50 placeholder:text-slate-300 dark:placeholder:text-slate-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 outline-none focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-slate-300 dark:focus-visible:outline-slate-600 focus-visible:outline-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300"
-          placeholder="Search your doctor..."
-          @focus="openFilters()"
-        />
-        <div
-          class="absolute top-0 left-0 h-10 w-10 flex justify-center items-center text-slate-400 peer-focus:text-primary-500 peer-disabled:opacity-20 transition-colors duration-300"
-        >
-          <iconify-icon class="iconify w-4 h-4" icon="lucide:search"></iconify-icon>
-        </div>
-        <NavbarSearchFilters />
-      </div>
+      
       <div class="flex items-center justify-center h-20 w-20 lg:hidden ml-auto">
         <Hamburger />
       </div>
