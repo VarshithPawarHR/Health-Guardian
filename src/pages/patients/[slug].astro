@@ -1,0 +1,44 @@
+---
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { db } from "@lib/db";
+import { chatsTable } from '@lib/db/schema';
+import { eq } from "drizzle-orm";
+
+const {slug} = Astro.params;
+
+const patientId = slug!;
+
+
+const chats =  await db
+  .select({
+    userId: chatsTable.userId,
+    content: chatsTable.content,
+    isBot: chatsTable.isBot,
+  })
+  .from(chatsTable)
+  .where(eq(chatsTable.userId, patientId));
+
+  
+  const chatString = chats.reduce((p,chat)=> `${p} \n ${chat.isBot?"user":"model"} : ${chat.content}`,"")
+
+
+  if(chatString){
+    const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_KEY);
+  const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          candidateCount: 1,
+          //maxOutputTokens: 40,
+          temperature: 1.0,
+        },
+        systemInstruction:
+          "You are HealthGuide, a compassionate and knowledgeable healthcare advisor. Your mission is to provide specific, evidence-based advice for both physical and mental health inquiries. Responses should be concise, clear, and within six sentences, provided in a single paragraph without emojis or special characters. For example, if a user mentions having a fever, you might advise them to take a fever-reducing medication like paracetamol, apply a cool, wet cloth to their forehead, and stay hydrated. For mental health queries, suggest actionable strategies such as mindfulness or physical activity, while citing reputable sources. Always encourage professional consultation when necessary, and ask relevant follow-up questions to better understand the user's condition or concerns and give response within 3 sentence only.",
+      })
+
+    const prompt = chatString + "summarize the whole chat into atmost 2 pharagraphs" ;
+
+    const result = await model.generateContent(prompt);
+
+    result.response.text()
+  }
+---
