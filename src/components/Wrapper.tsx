@@ -108,6 +108,57 @@ function Wrapper({ session }: { session: Session }) {
 
   scrollToBottom();
 
+  const recordRef = useRef<HTMLButtonElement>(null);
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    console.log("getUserMedia supported.");
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+      })
+
+      // Success callback
+      .then((stream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+
+        let chunks: Blob[] = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          chunks.push(e.data);
+        };
+
+        recordRef.current?.addEventListener("click", () => {
+          mediaRecorder.start();
+        });
+
+        mediaRecorder.onstop = (e) => {
+          const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+
+          const formData = new FormData();
+          formData.append("audio", blob, "recording.ogg");
+
+          // // Send the Blob to the backend
+          // fetch("/testaudio", {
+          //   method: "POST",
+          //   body: formData,
+          // })
+          //   .then((response) => response.json()) // assuming the backend returns a JSON response
+          //   .then((data) => {
+          //     console.log("Upload successful:", data);
+          //   })
+          //   .catch((error) => {
+          //     console.error("Error uploading audio:", error);
+          //   });
+        };
+      })
+      // Error callback
+      .catch((err) => {
+        console.error(`The following getUserMedia error occurred: ${err}`);
+      });
+  } else {
+    console.log("getUserMedia not supported on your browser!");
+  }
+
   return (
     <>
       {/* <Avatar position={[0, -3, 5]} scale={2} /> */}
@@ -125,11 +176,11 @@ function Wrapper({ session }: { session: Session }) {
               {messages.map((message) => (
                 <div
                   className={`${
-                    message.user ?  "ml-auto text-right":"mr-auto"
+                    message.user ? "ml-auto text-right" : "mr-auto"
                   } bg-cyan-400/10 px-2 py-4 rounded`}
                 >
                   <h4 className="text-gray-700 text-sm">
-                    {message.user ? "user":"bot"}
+                    {message.user ? "user" : "bot"}
                   </h4>
                   <p>{message.content}</p>
                 </div>
@@ -145,7 +196,7 @@ function Wrapper({ session }: { session: Session }) {
               onChange={(e) => setQuery(e.target.value)}
             ></textarea>
             <div className="flex flex-col gap-1 w-16">
-              <img src="" alt="mic" />
+              <button ref={recordRef}></button>
               <button
                 disabled={isBusy}
                 className={`${
