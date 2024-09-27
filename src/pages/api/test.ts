@@ -3,10 +3,13 @@ import type { APIRoute } from "astro";
 import * as sdk from "microsoft-cognitiveservices-speech-sdk";
 import { PassThrough } from "stream";
 import ollama from "ollama";
+import { db } from "@lib/db";
+import { chatsTable } from "@lib/db/schema";
+import { getSession } from "auth-astro/server";
 
 export const POST: APIRoute = async ({ request }) => {
   const {
-    query = "hello gemini",
+    query,
     gender = "f",
     history,
   }: {
@@ -16,6 +19,28 @@ export const POST: APIRoute = async ({ request }) => {
   } = await request.json();
 
   console.log({ query, gender, history });
+
+  if (!query) {
+    return new Response(null, {
+      status: 400,
+      statusText: "query is required",
+    });
+  }
+
+  const session = await getSession(request);
+
+  if (!session?.user?.id) {
+    return new Response(null, {
+      status: 403,
+      statusText: "must be logged in",
+    });
+  }
+
+  await db.insert(chatsTable).values({
+    userId: session.user.id,
+    isBot: false,
+    content: query,
+  });
 
   const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_KEY);
   const model = genAI.getGenerativeModel({
@@ -37,6 +62,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   const result = await chat.sendMessage(query);
   const responseText = result.response.text();
+
+  await db.insert(chatsTable).values({
+    userId: session.user.id,
+    isBot: true,
+    content: responseText,
+  });
 
   // const response = await ollama.chat({
   //   model: "echelonify/med-qwen2:latest",
