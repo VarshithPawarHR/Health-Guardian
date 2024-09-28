@@ -28,9 +28,9 @@
 ### Prerequisites
 
 To get started with the project, you need to have the following installed:
-- **Node.js** (v14 or later)
-- **MongoDB** or **Redis** (for session storage)
-- **OpenAI API key** or **Gemini API key**
+- **Astro Js , 3js , react -3 -fibre** 
+- **Turso**  (for session storage)
+-  **Gemini API key**
 
 ### Installation
 
