@@ -1,7 +1,4 @@
 ---
-import Layout from "@layouts/Default.astro";
-import SectionMuted from "@components/section/SectionMuted.astro";
-import Container from "@components/section/Container.astro";
 import SectionTitle from "@components/section/SectionTitle.astro";
 import HeroMainModuleOne from "@components/hero/HeroMainModuleOne.astro";
 import Patientcard from "@components/patientcard.astro";
@@ -87,8 +84,6 @@ const patients= await db.select({
   </div>
 </div>
 
-<SectionMuted class="'border-b border-muted-200 dark:border-muted-800'">
-  <Container>
     <SectionTitle
       title="Patients"
       subtitle="Find your patients"

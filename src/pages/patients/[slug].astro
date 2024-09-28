@@ -5,6 +5,7 @@ import { chatsTable, reportTable, userTable } from '@lib/db/schema';
 import { eq } from "drizzle-orm";
 import { getSession } from 'auth-astro/server';
 import Default from "@layouts/Default.astro";
+import Layout from "@layouts/Layout.astro";
 
 const {slug} = Astro.params;
 
@@ -72,7 +73,7 @@ if(reports.length){
   report = reports[0].report;
 }
 ---
-<Default title="">
+<Layout title="">
   <main class="flex flex-col justify-center items-center text-white py-20 gap-8">
 
     <h2 class="text-3xl font-bold text-left">Patient: {patient.name}</h2>
@@ -116,7 +117,7 @@ if(reports.length){
       }
     </section>
   </main>
-</Default>
+</Layout>
 
 <style>
   .profile-container {
