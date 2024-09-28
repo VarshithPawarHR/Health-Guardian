@@ -183,9 +183,6 @@ function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
 
   const socketRef = useRef<WebSocket | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<
-    "en-US" | "hi" | "ja"
-  >("en-US");
   const [transcript, setTranscript] = useState<string[]>([]);
   [];
 
@@ -200,14 +197,11 @@ function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
           mimeType: "audio/webm",
         });
 
-        const webSocketUrl =
-          selectedLanguage === "en-US"
-            ? "wss://api.deepgram.com/v1/listen?model=nova"
-            : `wss://api.deepgram.com/v1/listen?language=${selectedLanguage}`;
+        const webSocketUrl = "wss://api.deepgram.com/v1/listen?model=nova";
 
         const socket = new WebSocket(webSocketUrl, [
           "token",
-          "4d02349d6898a4c053a4b857273c7dab2c15e2e3",
+          import.meta.env.PUBLIC_DEEPGRAM_KEY,
         ]);
 
         socket.onopen = () => {

@@ -4,7 +4,7 @@ import { db } from "@lib/db";
 import { chatsTable, reportTable, userTable } from '@lib/db/schema';
 import { eq } from "drizzle-orm";
 import { getSession } from 'auth-astro/server';
-import Layout from "@layouts/Layout.astro";
+import Default from "@layouts/Default.astro";
 
 const {slug} = Astro.params;
 
@@ -30,7 +30,6 @@ const chats =  await db
   })
   .from(chatsTable)
   .where(eq(chatsTable.userId, patientId));
-
   
   const chatString = chats.reduce((p,chat)=> `${p} \n ${chat.isBot?"user":"model"} : ${chat.content}`,"")
 
@@ -73,7 +72,7 @@ if(reports.length){
   report = reports[0].report;
 }
 ---
-<Layout title="">
+<Default title="">
   <main class="flex flex-col justify-center items-center text-white py-20 gap-8">
 
     <h2 class="text-3xl font-bold text-left">Patient: {patient.name}</h2>
@@ -117,7 +116,7 @@ if(reports.length){
       }
     </section>
   </main>
-</Layout>
+</Default>
 
 <style>
   .profile-container {

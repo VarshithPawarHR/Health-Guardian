@@ -1,17 +1,16 @@
 ---
 import { chatsTable } from '@lib/db/schema';
 import Chatbot3D from '../components/Chatbot3D';
-import Layout from '../layouts/Layout.astro';
 import { getSession } from 'auth-astro/server';
 import { db } from '@lib/db';
 import { eq } from 'drizzle-orm';
+import Layout from '@layouts/Layout.astro';
 
 const session = await getSession(Astro.request);
 
 if (!session?.user?.id) {
   return Astro.redirect('/');
 }
-
 
 const chats =  await db
   .select({
@@ -21,7 +20,6 @@ const chats =  await db
   })
   .from(chatsTable)
   .where(eq(chatsTable.userId, session.user.id));
-
 
 const processedChats = chats.map(chat=>({
     content: chat.content,

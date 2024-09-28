@@ -9,6 +9,7 @@ import Patientcard from "@components/patientcard.astro";
 import { db } from "@lib/db";
 import { userTable } from "@lib/db/schema";
 import { eq } from "drizzle-orm";
+import Default from "@layouts/Default.astro";
 
 const patients= await db.select({
   id:userTable.id,
@@ -17,7 +18,7 @@ const patients= await db.select({
 .where(eq(userTable.role,"PATIENT"));
 ---
 
-<Layout title="Home">
+<Default title="Home">
 
 <div
   class="min-h-screen w-full overflow-hidden bg-muted-100 dark:bg-muted-1000"
@@ -96,14 +97,6 @@ const patients= await db.select({
     />
     
     {patients.map(patient=>(<div>
-
-    <Patientcard name={patient.name} id={patient.id}/>
+      <Patientcard name={patient.name} id={patient.id}/>
     </div>))}
-
-    
-  
-
-  <SectionMuted>
-   
-  </SectionMuted>
 </Layout>
