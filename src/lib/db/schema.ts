@@ -64,3 +64,13 @@ export const chatsTable = sqliteTable("chat", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+export const reportTable = sqliteTable("report", {
+  userId: text("user_id")
+    .notNull().primaryKey()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  report: text("content").notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});

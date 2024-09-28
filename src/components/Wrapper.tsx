@@ -17,7 +17,6 @@ function base64ToBlob(base64: string, contentType: string) {
 }
 
 function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
-  console.log("chats", chats);
   const [messages, setMessages] = useState<Chat[]>(chats);
 
   const [currentMessage, setCurrentMessage] = useState<{
@@ -105,56 +104,154 @@ function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
 
   scrollToBottom();
 
-  const recordRef = useRef<HTMLButtonElement>(null);
+  // const recordRef = useRef<HTMLButtonElement>(null);
+  // const [recording, setRecording] = useState(false);
+  // const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  // const chunksRef = useRef<Blob[]>([]);
 
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    console.log("getUserMedia supported.");
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-      })
+  // useEffect(() => {
+  //   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  //     console.log("getUserMedia supported.");
+  //     navigator.mediaDevices
+  //       .getUserMedia({ audio: true })
+  //       .then((stream) => {
+  //         const mediaRecorder = new MediaRecorder(stream, {
+  //           mimeType: "audio/ogg",
+  //         });
+  //         mediaRecorderRef.current = mediaRecorder;
 
-      // Success callback
+  //         mediaRecorder.ondataavailable = (e) => {
+  //           chunksRef.current.push(e.data);
+  //         };
+
+  //         mediaRecorder.onstop = () => {
+  //           const blob = new Blob(chunksRef.current, { type: "audio/ogg" });
+  //           const formData = new FormData();
+  //           formData.append("audio", blob, "recording.ogg");
+
+  //           // Send the Blob to the backend
+  //           fetch("/api/testaudio", {
+  //             method: "POST",
+  //             body: formData,
+  //           })
+  //             .then((response) => response.json())
+  //             .then((data) => {
+  //               console.log("Upload successful:", data);
+  //             })
+  //             .catch((error) => {
+  //               console.error("Error uploading audio:", error);
+  //             });
+
+  //           // Reset chunks after upload
+  //           chunksRef.current = [];
+  //         };
+
+  //         if (recordRef.current) {
+  //           recordRef.current.addEventListener("click", handleRecord);
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error(`The following getUserMedia error occurred: ${err}`);
+  //       });
+  //   } else {
+  //     console.log("getUserMedia not supported on your browser!");
+  //   }
+
+  //   return () => {
+  //     if (recordRef.current) {
+  //       recordRef.current.removeEventListener("click", handleRecord);
+  //     }
+
+  //     // Cleanup media stream and recorder when component unmounts
+  //     mediaRecorderRef.current?.stream
+  //       .getTracks()
+  //       .forEach((track) => track.stop());
+  //   };
+  // }, []);
+
+  // const handleRecord = () => {
+  //   setRecording((recording) => {
+  //     if (recording) {
+  //       mediaRecorderRef.current?.stop();
+  //       return false;
+  //     } else {
+  //       mediaRecorderRef.current?.start();
+  //       return true;
+  //     }
+  //   });
+  // };
+
+  const socketRef = useRef<WebSocket | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<
+    "en-US" | "hi" | "ja"
+  >("en-US");
+  const [transcript, setTranscript] = useState<string[]>([]);
+  [];
+
+  async function transcribe() {
+    console.log("Started transcription");
+    await navigator.mediaDevices
+      .getUserMedia({ audio: true })
       .then((stream) => {
-        const mediaRecorder = new MediaRecorder(stream);
-
-        let chunks: Blob[] = [];
-
-        mediaRecorder.ondataavailable = (e) => {
-          chunks.push(e.data);
-        };
-
-        recordRef.current?.addEventListener("click", () => {
-          mediaRecorder.start();
+        if (!MediaRecorder.isTypeSupported("audio/webm"))
+          return alert("Browser not supported");
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: "audio/webm",
         });
 
-        mediaRecorder.onstop = (e) => {
-          const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+        const webSocketUrl =
+          selectedLanguage === "en-US"
+            ? "wss://api.deepgram.com/v1/listen?model=nova"
+            : `wss://api.deepgram.com/v1/listen?language=${selectedLanguage}`;
 
-          const formData = new FormData();
-          formData.append("audio", blob, "recording.ogg");
+        const socket = new WebSocket(webSocketUrl, [
+          "token",
+          "4d02349d6898a4c053a4b857273c7dab2c15e2e3",
+        ]);
 
-          // // Send the Blob to the backend
-          // fetch("/testaudio", {
-          //   method: "POST",
-          //   body: formData,
-          // })
-          //   .then((response) => response.json()) // assuming the backend returns a JSON response
-          //   .then((data) => {
-          //     console.log("Upload successful:", data);
-          //   })
-          //   .catch((error) => {
-          //     console.error("Error uploading audio:", error);
-          //   });
+        socket.onopen = () => {
+          mediaRecorder.addEventListener("dataavailable", (event) => {
+            if (event.data.size > 0 && socket.readyState === 1) {
+              socket.send(event.data);
+            }
+          });
+          mediaRecorder.start(1000);
         };
-      })
-      // Error callback
-      .catch((err) => {
-        console.error(`The following getUserMedia error occurred: ${err}`);
+
+        socket.onmessage = (message) => {
+          const received = message && JSON.parse(message?.data as string);
+          const rtranscript = received.channel?.alternatives[0]
+            .transcript as string;
+          setTranscript((prev) => {
+            if (!prev.some((item) => item === rtranscript)) {
+              return [...prev, rtranscript];
+            }
+            return prev;
+          });
+          setQuery(transcript.join(" "));
+        };
+
+        socket.onclose = () => {
+          console.log({ event: "onclose" });
+        };
+
+        socket.onerror = (error) => {
+          console.log({ event: "onerror", error });
+        };
+        socketRef.current = socket;
       });
-  } else {
-    console.log("getUserMedia not supported on your browser!");
   }
+
+  useEffect(() => {
+    if (isRecording) {
+      setQuery("");
+      transcribe();
+    } else {
+      setQuery(transcript.join(" "));
+      setTranscript([]);
+    }
+  }, [isRecording]);
 
   return (
     <>
@@ -193,7 +290,15 @@ function Wrapper({ session, chats }: { session: Session; chats: Chat[] }) {
               onChange={(e) => setQuery(e.target.value)}
             ></textarea>
             <div className="flex flex-col gap-1 w-16">
-              <button ref={recordRef}></button>
+              <button
+                // ref={recordRef}
+                onClick={() => setIsRecording((r) => !r)}
+                className={`${
+                  isRecording ? "bg-emerald-400" : "bg-primary-500"
+                }  p-2 grid place-content-center rounded`}
+              >
+                <img src="mic.png" alt="mic" className="w-8 h-8" />
+              </button>
               <button
                 disabled={isBusy}
                 className={`${

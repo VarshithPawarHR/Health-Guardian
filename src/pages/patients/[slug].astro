@@ -1,7 +1,7 @@
 ---
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "@lib/db";
-import { chatsTable, userTable } from '@lib/db/schema';
+import { chatsTable, reportTable, userTable } from '@lib/db/schema';
 import { eq } from "drizzle-orm";
 import { getSession } from 'auth-astro/server';
 import Layout from "@layouts/Layout.astro";
@@ -62,23 +62,61 @@ if(!session?.user?.id){
   return Astro.redirect("/")
 }
 
+let report = ""
+
+const reports= await db.select({
+  report:reportTable.report
+}).from(reportTable)
+.where(eq(reportTable.userId,patientId));
+
+if(reports.length){
+  report = reports[0].report;
+}
 ---
 <Layout title="">
-  <section class="profile-container text-white">
-    <!-- Profile Header -->
-    <h1>{patient.name}</h1>
-    {
-      summary?(
-      <p>
-      {summary}
-      </p>
-      ):(
+  <main class="flex flex-col justify-center items-center text-white py-20 gap-8">
+
+    <h2 class="text-3xl font-bold text-left">Patient: {patient.name}</h2>
+    
+    <section class="w-full max-w-xl mx-auto">
+      <h3 class="text-2xl font-bold text-left">Patient Report</h3>
+      <p class="report">{report}</p>
+    </section>
+
+    <section class="w-full max-w-xl mx-auto">
+      <h3 class="text-2xl font-bold text-left">Report</h3>
+    <form id="reportForm" class="w-full flex flex-col gap-4">
+      <h5>Paitent Report Editor</h5>
+      <label class="flex flex-col gap-2 w-full" >
+        <textarea name="report" id="" cols="80" class="w-full bg-neutral-800" value={report} required></textarea>
+        
+      </label>
+      <input type="hidden" name="userId"  value={patientId}>
+
+      <button
+      class="relative font-sans font-normal inline-flex items-center justify-center leading-5 no-underline space-x-1 text-white bg-primary-600 h-12 px-5 py-3 text-sm rounded-xl hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-600/20 tw-accessibility transition-all duration-300 cursor-pointer"
+      >
+      Update
+      </button>
+
+    </form>
+    </section>
+    <section class="w-full max-w-xl mx-auto text-white">
+      <h3 class="text-2xl font-bold text-left">Coversation Summary</h3>
+      
+      {
+        summary?(
         <p>
-          No iteraction so far
+        {summary}
         </p>
-      )
-    }
-  </section>
+        ):(
+          <p>
+            No iteraction so far
+          </p>
+        )
+      }
+    </section>
+  </main>
 </Layout>
 
 <style>
@@ -235,3 +273,29 @@ if(!session?.user?.id){
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.87);
   }
 </style>
+
+<script>
+  import { actions } from 'astro:actions';
+  
+  const form = document.querySelector('#reportForm') as HTMLFormElement;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    console.log("form ",formData)
+    
+    const { data, error } = await actions.updateReport(formData);
+
+    if (data?.report) {
+      const ele = form.querySelector<HTMLInputElement>("textarea")        
+        if(ele){
+          ele.value = data.report;
+          } 
+
+      const ele1 = form.querySelector<HTMLInputElement>("report");
+        if(ele1){
+          ele1.textContent = data.report;
+        }
+    }
+  });
+</script>

@@ -5,7 +5,6 @@ import Layout from '../layouts/Layout.astro';
 import { getSession } from 'auth-astro/server';
 import { db } from '@lib/db';
 import { eq } from 'drizzle-orm';
-import { promise } from 'astro:schema';
 
 const session = await getSession(Astro.request);
 

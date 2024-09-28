@@ -4,8 +4,9 @@ import * as sdk from "microsoft-cognitiveservices-speech-sdk";
 import { PassThrough } from "stream";
 import ollama from "ollama";
 import { db } from "@lib/db";
-import { chatsTable } from "@lib/db/schema";
+import { chatsTable, reportTable } from "@lib/db/schema";
 import { getSession } from "auth-astro/server";
+import { eq } from "drizzle-orm";
 
 export const POST: APIRoute = async ({ request }) => {
   const {
@@ -42,6 +43,19 @@ export const POST: APIRoute = async ({ request }) => {
     content: query,
   });
 
+  const r = await db
+    .select({
+      report: reportTable.report,
+    })
+    .from(reportTable)
+    .where(eq(reportTable.userId, session.user.id));
+
+  let report = "";
+
+  if (r.length) {
+    report = r[0].report;
+  }
+
   const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_KEY);
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
@@ -51,7 +65,10 @@ export const POST: APIRoute = async ({ request }) => {
       temperature: 1.0,
     },
     systemInstruction:
-      "You are HealthGuide, a compassionate and knowledgeable healthcare advisor. Your mission is to provide specific, evidence-based advice for both physical and mental health inquiries. Responses should be concise, clear, and within six sentences, provided in a single paragraph without emojis or special characters. For example, if a user mentions having a fever, you might advise them to take a fever-reducing medication like paracetamol, apply a cool, wet cloth to their forehead, and stay hydrated. For mental health queries, suggest actionable strategies such as mindfulness or physical activity, while citing reputable sources. Always encourage professional consultation when necessary, and ask relevant follow-up questions to better understand the user's condition or concerns and give response within 3 sentence only.",
+      "You are HealthGuide, a compassionate and knowledgeable healthcare advisor. Your mission is to provide specific, evidence-based advice for both physical and mental health inquiries. For example, if a user mentions having a fever, you might advise them to take a fever-reducing medication like paracetamol, apply a cool, wet cloth to their forehead, and stay hydrated. For mental health queries, suggest actionable strategies such as mindfulness or physical activity, while citing reputable sources. Always encourage professional consultation when necessary, and ask relevant follow-up questions to better understand the user's condition or concerns and responses should be concise, clear, and within three sentences, provided in a single paragraph without emojis or special characters." +
+      report
+        ? "here is the  medical report of the patient whom who are talking to: "
+        : "" + report,
   });
   const chat = model.startChat({
     history: history.map((chat) => ({
@@ -61,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
   });
 
   const result = await chat.sendMessage(query);
-  const responseText = result.response.text();
+  const responseText = result.response.text().replace(/[^a-zA-Z ]/g, '');
 
   await db.insert(chatsTable).values({
     userId: session.user.id,
