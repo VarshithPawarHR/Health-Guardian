@@ -1,54 +1,56 @@
-# Astro Starter Kit: Basics
+# HealthGuardian Chatbot
 
-```sh
-npm create astro@latest -- --template basics
-```
+**HealthGuardian** is a conversational AI chatbot designed for healthcare purposes. It allows doctors to input a patient's prescription and condition, and uses this information combined with ChatGPT/Gemini API's general medical knowledge to answer patient queries. The bot maintains context across interactions, enabling it to handle follow-up questions intelligently.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## Features
+- **Doctor Input**: Doctors can input patient prescriptions and conditions.
+- **Personalized Responses**: Chatbot generates responses based on the doctor’s input combined with general medical knowledge.
+- **Follow-up Questions**: The chatbot remembers past queries and uses them to provide relevant answers for follow-up questions.
+- **Contextual Conversations**: The chatbot maintains session-based memory, allowing it to track patient interactions over time.
+- **AI-powered**: Powered by the OpenAI (ChatGPT) or Gemini API for natural language understanding and response generation.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+---
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+## Table of Contents
 
-## 🚀 Project Structure
+- [Project Setup](#project-setup)
+- [Architecture](#architecture)
+- [Key Components](#key-components)
+- [Session Management](#session-management)
+- [API Integration](#api-integration)
+- [Usage](#usage)
+- [Future Enhancements](#future-enhancements)
 
-Inside of your Astro project, you'll see the following folders and files:
+---
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Project Setup
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### Prerequisites
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+To get started with the project, you need to have the following installed:
+- **Node.js** (v14 or later)
+- **MongoDB** or **Redis** (for session storage)
+- **OpenAI API key** or **Gemini API key**
 
-Any static assets, like images, can be placed in the `public/` directory.
+### Installation
 
-## 🧞 Commands
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/healthguardian-chatbot.git
+   cd healthguardian-chatbot
+2,**Install dependencies:**
+```npm install
 
-All commands are run from the root of the project, from a terminal:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-## 👀 Want to learn more?
+**.env**
+OPENAI_API_KEY=your_openai_api_key
+GEMINI_API_KEY=your_gemini_api_key
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+**
+
+Usage
+Doctor Inputs Patient Details: The doctor enters the patient’s prescription and condition via a user interface.
+Patient Asks Questions: Patients ask questions related to their condition or medication.
+Chatbot Provides Answers: The chatbot responds using a combination of the doctor's input and general medical knowledge from the OpenAI/Gemini API.
+
