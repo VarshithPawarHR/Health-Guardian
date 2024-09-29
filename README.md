@@ -22,6 +22,7 @@
 - [Future Enhancements](#future-enhancements)
 
 ---
+##note the repo name has been changed clone accordingly
 
 ## Project Setup
 
@@ -54,3 +55,4 @@ Doctor Inputs Patient Details: The doctor enters the patient’s prescription an
 Patient Asks Questions: Patients ask questions related to their condition or medication.
 Chatbot Provides Answers: The chatbot responds using a combination of the doctor's input and general medical knowledge from the OpenAI/Gemini API.
 
+**
